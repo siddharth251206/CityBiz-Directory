@@ -1,0 +1,44 @@
+<%- include('partials/header', { title: 'Search Businesses | CityBiz Directory', currentPage: 'search', stylesheets: ['searchbiz.css'] }) %>
+
+<main>
+    <section id="controls">
+        <label for="sortOrder">Sort by Rating:</label>
+        <select id="sortOrder">
+            <option value="none">None</option>
+            <option value="desc">High to Low</option>
+            <option value="asc">Low to High</option>
+        </select>
+
+        <label for="filtercat">Filter by Category:</label>
+        <select id="filtercat"> <option value="All">All</option>
+            
+            <% if (typeof categories !== 'undefined') { %>
+              <% categories.forEach(category => { %>
+                <option value="<%= category.name %>"><%= category.name %></option>
+              <% }) %>
+            <% } %>
+
+        </select>
+
+        <label for="filterstar">Filter by Rating:</label>
+        <select onchange="handleRatingFilter(this.value)" id="filterstar">
+            <option value="all">All Ratings</option>
+            <option value="1-2">1 - 2</option>
+            <option value="2-3">2 - 3</option>
+            <option value="3-4">3 - 4</option>
+            <option value="4-5">4 - 5</option>
+        </select>
+
+        <input type="text" id="searchInput" placeholder="Search by name..." />
+        <button id="searchBtn">Search</button>
+    </section>
+    
+    <div class="topbuss" id="topbuss"></div>
+</main>
+
+<script>
+    // Pass businesses data from server to client
+    const data = <%- JSON.stringify(businesses) %>;
+</script>
+
+<%- include('partials/footer', { scripts: ['utils.js','searchbiz.js'] }) %>

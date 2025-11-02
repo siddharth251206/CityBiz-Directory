@@ -1,0 +1,70 @@
+<%- include('partials/header', { title: 'Register | CityBiz Directory', currentPage: 'register', stylesheets: ['login.css'] }) %>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="login-container">
+        <h2>Create Your Account</h2>
+        <form id="registerForm">
+            
+            <div class="form-group">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone (Optional):</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+     
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">I am a:</label>
+                <select id="role" name="role" required>
+                    <option value="viewer" selected>Viewer (I want to find businesses)</option>
+                    <option value="owner">Business Owner (I want to list a business)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">Register</button>
+        </form>
+        <p style="margin-top: 20px; text-align: center;">
+            Already have an account? <a href="/login">Login here</a>
+        </p>
+    </div>
+    
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.href = '/login'; // Redirect to login after successful register
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('Registration failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

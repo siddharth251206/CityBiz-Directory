@@ -1,0 +1,52 @@
+<%- include('partials/header', { title: 'Add Businesses | CityBiz Directory', currentPage: 'add', stylesheets: ['addbiz.css'] }) %>
+
+<section class="form-section">
+    <h2>Add a Business</h2>
+    <form id="business-form">
+        <label for="biz-name">Business Name:</label>
+        <input type="text" id="biz-name" name="name" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="photos">Business Photos:</label>
+        <input type="file" id="photos" name="image" accept="image/*" onchange="checkSize(this)" required>
+
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="website">Website (Optional):</label>
+        <input type="url" id="website" name="website">
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state" required>
+
+        <label for="pincode">Pincode:</label>
+        <input type="text" id="pincode" name="pincode" required>
+        
+        <label for="category">Category:</label>
+        <select name="category_id" id="category" required>
+            <option value="" disabled selected hidden>Select the category...</option>
+            
+            <% if (typeof categories !== 'undefined') { %>
+              <% categories.forEach(category => { %>
+                <option value="<%= category.category_id %>"><%= category.name %></option>
+              <% }) %>
+            <% } %>
+
+        </select>    
+        
+        <button type="submit">Submit Business</button>
+    </form>
+</section>
+
+<%- include('partials/footer', { scripts: ['addbiz.js'] }) %>

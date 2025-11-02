@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'CityBiz Directory' %></title>
+    <link rel="stylesheet" href="/css/common.css">
+
+    <% if (typeof stylesheets !== 'undefined') { %>
+        <% stylesheets.forEach(function(stylesheet) { %>
+            <link rel="stylesheet" href="/css/<%= stylesheet %>">
+        <% }); %>  <% } %>
+    </head>
+<body>
+    <div class="gradient-bg"></div>
+    <header class="site-header">
+        <div class="header-container">
+            <img src="/images/logo.png" alt="Logo" id="logo">
+            <nav class="navbar">
+                <ul class="options">
+                    <li <%= currentPage === 'home' ? 'id="current"' : '' %>><a href="/">HOME</a></li>
+                    <li <%= currentPage === 'search' ? 'id="current"' : '' %>><a href="/search">SEARCH BUSINESSES</a></li>
+                    <li <%= currentPage === 'add' ? 'id="current"' : '' %>><a href="/add">ADD BUSINESSES</a></li>
+                    <li <%= currentPage === 'about' ? 'id="current"' : '' %>><a href="/about">ABOUT US</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>

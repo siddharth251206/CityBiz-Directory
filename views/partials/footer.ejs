@@ -1,0 +1,19 @@
+<footer>
+    <div class="footer-links">
+        <a href="/terms">Terms of Service</a> ||
+        <a href="/privacy">Privacy Policy</a> ||
+        <a href="/contact">Contact Us</a>
+    </div>
+    <div class="social-media">
+        <a href="https.facebook.com" target="_blank">Facebook</a>
+        <a href="https.twitter.com" target="_blank">Twitter</a>
+        <a href="https.instagram.com" target="_blank">Instagram</a>
+    </div>
+    <p>&copy; 2025 CityBiz Directory. All Rights Reserved.</p>
+</footer>
+
+<% if (typeof scripts !== 'undefined') { %>
+    <% scripts.forEach(function(script) { %>
+        <script src="/js/<%= script %>"></script>
+    <% }); %>  <% } %>      </body>
+</html>
