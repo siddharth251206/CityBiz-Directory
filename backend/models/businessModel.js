@@ -63,16 +63,16 @@ class Business {
   // Create new business
   static async create(businessData) {
     // Note: owner_id and category_id must be provided
-    const { owner_id, category_id, name, description, address, city, state, pincode, phone, email, website } = businessData;
+    const { owner_id, category_id, name, description, address, city, state, pincode, phone, email,website=null, image } = businessData;
     
     const sql = `
       INSERT INTO Business 
-      (owner_id, category_id, name, description, address, city, state, pincode, phone, email, website) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (owner_id, category_id, name, description, address, city, state, pincode, phone, email, website, image) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const [result] = await db.query(sql, [
-      owner_id, category_id, name, description, address, city, state, pincode, phone, email, website
+      owner_id, category_id, name, description, address, city, state, pincode, phone, email, website, image
     ]);
     
     return this.getById(result.insertId);
@@ -81,17 +81,17 @@ class Business {
   // Update business
   static async update(id, businessData) {
     // Does not allow updating owner_id or avg_rating directly
-    const { category_id, name, description, address, city, state, pincode, phone, email, website, status } = businessData;
+    const { category_id, name, description, address, city, state, pincode, phone, email, website, status, image } = businessData;
     
     const sql = `
       UPDATE Business SET 
       category_id = ?, name = ?, description = ?, address = ?, city = ?, state = ?, pincode = ?, 
-      phone = ?, email = ?, website = ?, status = ? 
+      phone = ?, email = ?, website = ?, status = ?, image = ? 
       WHERE business_id = ?
     `;
 
     await db.query(sql, [
-      category_id, name, description, address, city, state, pincode, phone, email, website, status || 'pending', id
+      category_id, name, description, address, city, state, pincode, phone, email, website, status || 'pending',image, id
     ]);
     
     return this.getById(id);

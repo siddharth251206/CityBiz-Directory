@@ -25,11 +25,15 @@ app.set('views', path.join(__dirname, '../views'));
 const viewRoutes = require('./routes/viewRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');     
+const favoriteRoutes = require('./routes/favoriteRoutes'); 
 
 // Use routes
 app.use('/', viewRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);     
+app.use('/api/favorites', favoriteRoutes); 
 
 // Error handling middleware
 const errorHandler = require('./middleware/errorHandler');

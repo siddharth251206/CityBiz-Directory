@@ -9,21 +9,26 @@ exports.getUserFavorites = async (req, res, next) => {
     next(error);
   }
 };
-
-// Add a new favorite
+//add fav
 exports.addFavorite = async (req, res, next) => {
   try {
     const favoriteData = {
-      user_id: req.user.id,
+      user_id: req.user.id, // Get user_id from auth token
       business_id: req.body.business_id 
     };
+
+    // Check if it's already favorited
+    const isAlreadyFavorited = await Favorite.isFavorited(favoriteData.user_id, favoriteData.business_id);
+    if (isAlreadyFavorited) {
+        return res.status(400).json({ message: 'Already in favorites' });
+    }
+
     const favorite = await Favorite.create(favoriteData);
     res.status(201).json({ message: 'Favorite added', favorite });
   } catch (error) {
     next(error);
   }
 };
-
 // Remove a favorite
 exports.removeFavorite = async (req, res, next) => {
   try {

@@ -1,44 +1,76 @@
-<%- include('partials/header', { title: 'Search Businesses | CityBiz Directory', currentPage: 'search', stylesheets: ['searchbiz.css'] }) %>
+<%- include('partials/header', { title: 'Search Businesses', currentPage: 'search', stylesheets: ['searchbiz.css'] }) %>
 
-<main>
-    <section id="controls">
-        <label for="sortOrder">Sort by Rating:</label>
-        <select id="sortOrder">
-            <option value="none">None</option>
-            <option value="desc">High to Low</option>
-            <option value="asc">Low to High</option>
-        </select>
+<main class="search-page-main">
 
-        <label for="filtercat">Filter by Category:</label>
-        <select id="filtercat"> <option value="All">All</option>
-            
-            <% if (typeof categories !== 'undefined') { %>
-              <% categories.forEach(category => { %>
-                <option value="<%= category.name %>"><%= category.name %></option>
-              <% }) %>
-            <% } %>
+<!-- 1. BANNER -->
+<section class="search-banner">
+    <h1>Find Your Next Local Gem</h1>
+    <p>Search for any business, category, or service in your city.</p>
+</section>
 
-        </select>
+<!-- 2. LARGE FILTER BAR -->
+<section class="search-controls-container">
+    <div class="search-controls">
+        <div class="filter-group">
+            <label for="searchInput">Search by Name</label>
+            <input type="text" id="searchInput" placeholder="e.g., Cafe, Plumber...">
+        </div>
+        
+        <div class="filter-group">
+            <label for="filtercat">Category</label>
+            <select id="filtercat">
+                <option value="All">All Categories</option>
+                <% if (typeof categories !== 'undefined') { %>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category.name %>"><%= category.name %></option>
+                  <% }) %>
+                <% } %>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterstar">Rating</label>
+            <select id="filterstar">
+                <option value="all">All Ratings</option>
+                <option value="4-5">⭐ 4 Stars & Up</option>
+                <option value="3-5">⭐ 3 Stars & Up</option>
+                <option value="2-5">⭐ 2 Stars & Up</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="sortOrder">Sort By</label>
+            <select id="sortOrder">
+                <option value="desc">Highest Rated</option>
+                <option value="asc">Lowest Rated</option>
+            </select>
+        </div>
 
-        <label for="filterstar">Filter by Rating:</label>
-        <select onchange="handleRatingFilter(this.value)" id="filterstar">
-            <option value="all">All Ratings</option>
-            <option value="1-2">1 - 2</option>
-            <option value="2-3">2 - 3</option>
-            <option value="3-4">3 - 4</option>
-            <option value="4-5">4 - 5</option>
-        </select>
+        <button id="applyFiltersBtn" class="filter-btn">Search</button>
+    </div>
+</section>
 
-        <input type="text" id="searchInput" placeholder="Search by name..." />
-        <button id="searchBtn">Search</button>
-    </section>
+<!-- 3. RESULTS AREA -->
+<section class="results-area">
+    <h2 id="results-heading">Showing all businesses</h2>
     
-    <div class="topbuss" id="topbuss"></div>
+    <!-- 3-Column Grid Container -->
+    <div class="business-grid" id="topbuss">
+        <!-- Business cards will be rendered here -->
+    </div>
+
+    <!-- 5. "LOAD MORE" BUTTON -->
+    <div class="pagination-controls" id="pagination-controls">
+        <button id="load-more-btn">Load More</button>
+    </div>
+</section>
+
+
 </main>
 
 <script>
-    // Pass businesses data from server to client
-    const data = <%- JSON.stringify(businesses) %>;
+// Pass businesses data from server to client
+const businessesData = <%- JSON.stringify(businesses || []) %>;
 </script>
 
-<%- include('partials/footer', { scripts: ['utils.js','searchbiz.js'] }) %>
+<%- include('partials/footer', { scripts: ['utils.js', 'searchbiz.js'] }) %>

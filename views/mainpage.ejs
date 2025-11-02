@@ -1,29 +1,43 @@
 <%- include('partials/header', { title: 'CityBiz Directory', currentPage: 'home', stylesheets: ['mainstyles.css'] }) %>
 
 <main>
-    <div style="display: flex; justify-content: center;"><h1 class="heading">Top 4 Businesses In Your City</h1></div>
-    <div class="topbuss" id="topbuss"></div>
-    
-    <section class="category-section">
-        <div style="display: flex; justify-content: center;"><h2 class="category-heading heading">Browse by Category</h2></div>
-        
-        <div class="category-grid">
-          <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-            <% categories.forEach(category => { %>
-              <a href="/search?categoryId=<%= category.category_id %>" class="category-card">
-                <%= category.name %>
-              </a>
-            <% }) %>
-          <% } else { %>
-            <p>No categories found.</p>
-          <% } %>
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Find the best local businesses</h1>
+            <p>From cafes to plumbers, we have you covered.</p>
+            
+            <form action="/search" method="GET" class="hero-search-form">
+                <input type="text" name="name" placeholder="What are you looking for?" class="hero-search-what">
+                <button type="submit" class="hero-search-btn">Search</button>
+            </form>
         </div>
-        </section>
+    </section>
+
+    <section class="category-section">
+        <h2 class="section-heading">Browse by Category</h2>
+        <div class="category-grid">
+            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                  <a href="/search?categoryId=<%= category.category_id %>" class="category-card">
+                    <span><%= category.name %></span>
+                  </a>
+                <% }) %>
+            <% } else { %>
+                <p>No categories found.</p>
+            <% } %>
+        </div>
+    </section>
+
+    <section class="top-business-section">
+        <h2 class="section-heading">Top Rated Businesses</h2>
+        
+        <div class="topbuss" id="topbuss"></div>
+    </section>
+
 </main>
 
 <script>
-    // Pass businesses data from server to client
-    // This '|| []' prevents errors if 'businesses' is ever null or undefined
+    // Pass the top-rated businesses to your client-side scripts
     const businesses = <%- JSON.stringify(businesses || []) %>;
 </script>
 

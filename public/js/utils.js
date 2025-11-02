@@ -1,111 +1,70 @@
-// public/js/utils.js
-
 /**
  * Renders a list of business cards into a container.
  * @param {HTMLElement} container - The element to inject cards into.
  * @param {Array} businesses - An array of business objects.
+ * @param {boolean} [append=false] - If true, adds cards. If false, replaces content.
  */
-function renderBusinesses(container, businesses) {
-  container.innerHTML = ""; // Clear existing content
+function renderBusinesses(container, businesses, append = false) {
+  // If we are NOT appending, clear the container first.
+  if (!append) {
+    container.innerHTML = "";
+  }
 
-  if (businesses.length === 0) {
-    container.innerHTML = "<p>No businesses found.</p>";
+  // Handle the "Empty State"
+  if (!append && businesses.length === 0) {
+    container.innerHTML = "<p class='empty-state'>No businesses found for your search. Try changing your filters.</p>";
     return;
   }
 
   businesses.forEach((biz) => {
     const card = document.createElement("div");
-    card.className = "cards";
-    //
-    // -----------------  THE FIXES ARE HERE -----------------
-    //
+    card.className = "cards"; 
+
+    const reviewCount = biz.review_count || 0; 
+    const isOpen = Math.random() > 0.5; // Dummy data
+    const imageUrl = biz.image || `https://placehold.co/200x250/eee/ccc?text=No+Image&font=lato`;
+
     card.innerHTML = `
-      <img class="rounded img_height" src="${biz.image}" alt="${biz.name}">
-      <h3 class="margin-l">${biz.name}</h3>
-      <div class="rating margin-l">⭐ ${biz.avg_rating} / 5</div> 
-      <div class="category-pill">${biz.category_name}</div>
-      <div class="title">View Details</div>
-      <div class="details">
-        <p>${biz.description}</p>
-        <h3 style="color:rgb(24, 24, 77)">Contact Details</h3>
-        <address>
-          📧 Email: <a href="mailto:${biz.email}">${biz.email}</a><br>
-          📞 Phone: ${biz.phone}
-        </address>
+      <div class="card-image">
+        <img src="${imageUrl}" alt="${biz.name}">
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <h3 class="card-title">📍 ${biz.name}</h3>
+          <span class="card-status ${isOpen ? 'open' : 'closed'}">
+            ${isOpen ? '🟢 Open Now' : '🔴 Closed'}
+          </span>
+        </div>
+        <div class="card-meta">
+          <span class="card-category">${biz.category_name}</span>
+          <span class="card-location"> - ${biz.city}</span>
+        </div>
+        <div class="card-rating">
+          <span class="rating-stars">⭐ ${biz.avg_rating}</span>
+          <span class="review-count">(${reviewCount} reviews)</span>
+        </div>
+        <p class="card-address">📞 ${biz.phone} | 📍 ${biz.address}</p>
+        <div class="card-actions">
+          <a href="${biz.website || '#'}" class="card-btn-website" ${!biz.website ? 'disabled' : ''}>🌐 Website</a>
+          
+          <a href="/business/${biz.business_id}" class="card-btn-details title">View Details</a>
+        </div>
       </div>
     `;
-    //
-    // ----------------- END OF FIXES -----------------
-    //
     
-    // Add color logic for rating
-    const ratingBox = card.querySelector(".rating");
-    if (biz.avg_rating <= 2) ratingBox.style.backgroundColor = "red";
-    else if (biz.avg_rating <= 3) ratingBox.style.backgroundColor = "yellow";
-    else ratingBox.style.backgroundColor = "greenyellow";
-
     container.appendChild(card);
   });
 
-  // After rendering, attach the click events
-  attachDetailsClickEvents();
+  // Since it's a real link now, we don't need the old click event.
+  // We can leave this function empty or remove it from searchbiz.js
+  attachDetailsClickEvents(container, append);
 }
 
 /**
- * Attaches click event listeners for the "View Details" functionality.
+ * Attaches click event listeners. (No longer needed for 'View Details')
  */
-function attachDetailsClickEvents() {
-  const all_details = document.querySelectorAll(".cards");
-  let overlay = document.querySelector(".overlay");
-
-  if (!overlay) {
-    overlay = document.createElement("div");
-    overlay.classList.add("overlay");
-    document.body.appendChild(overlay);
-  }
-
-  all_details.forEach((card) => {
-    const title = card.querySelector(".title");
-    const detail = card.querySelector(".details");
-
-    title.addEventListener("click", (e) => {
-      e.stopPropagation();
-
-      document.querySelectorAll(".details.active").forEach((openDetail) => {
-        if (openDetail !== detail) {
-          openDetail.classList.remove("active");
-          setTimeout(() => (openDetail.style.display = "none"), 500);
-        }
-      });
-
-      if (detail.classList.contains("active")) {
-        detail.classList.remove("active");
-        title.textContent = "View Details";
-        setTimeout(() => (detail.style.display = "none"), 500);
-        overlay.classList.remove("active");
-        card.classList.remove("active");
-      } else {
-        detail.style.display = "block";
-        title.textContent = "Hide Details";
-        setTimeout(() => detail.classList.add("active"), 10);
-        overlay.classList.add("active");
-        card.classList.add("active");
-      }
-    });
-  });
-
-  // Attach overlay click once
-  if (!overlay.dataset.listenerAttached) {
-    overlay.addEventListener("click", () => {
-      document.querySelectorAll(".details.active").forEach((openDetail) => {
-        openDetail.classList.remove("active");
-        setTimeout(() => (openDetail.style.display = "none"), 500);
-      });
-      overlay.classList.remove("active");
-      document.querySelectorAll(".cards.active").forEach((activeCard) => {
-        activeCard.classList.remove("active");
-      });
-    });
-    overlay.dataset.listenerAttached = "true";
-  }
+function attachDetailsClickEvents(container, append) {
+  // This function is no longer needed for the "View Details" button
+  // because it is now a direct <a> link.
+  // We can still use it if we add other interactive elements later.
 }

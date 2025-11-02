@@ -2,35 +2,37 @@ const express = require('express');
 const router = express.Router();
 const Business = require('../models/businessModel');
 const Category = require('../models/categoryModel');
-
+const Review = require('../models/reviewModel');
 // Home page
 router.get('/', async (req, res) => {
   try {
-    // Fetch both businesses and categories
-    const topBusinesses = await Business.getTopRated(4);
-    const categories = await Category.getAll(); // <-- FETCH CATEGORIES
-    
+    // Fetch data for the new homepage
+    const topBusinesses = await Business.getTopRated(6); // Get 6 for a nice grid
+    const categories = await Category.getAll();
+
+    // Render the mainpage, passing both sets of data
     res.render('mainpage', { 
-      businesses: topBusinesses, 
-      categories: categories  // <-- PASS CATEGORIES
+      businesses: topBusinesses, // 'businesses' is used by your mainpage.js
+      categories: categories 
     });
   } catch (error) {
-    res.status(500).render('error', { error });
+    // Use the new error handling
+    res.status(500).send('Server Error: ' + error.message);
   }
 });
 // Search businesses page
 router.get('/search', async (req, res) => {
   try {
-    // Fetch both businesses and categories
+    // We need both all businesses AND all categories for the filters
     const businesses = await Business.getAll();
-    const categories = await Category.getAll(); // <-- FETCH CATEGORIES
+    const categories = await Category.getAll();
     
     res.render('searchbiz', { 
-      businesses: businesses, 
-      categories: categories // <-- PASS CATEGORIES
+      businesses: businesses,
+      categories: categories // Pass categories for the filter dropdown
     });
   } catch (error) {
-    res.status(500).render('error', { error });
+    res.status(500).send('Server Error: ' + error.message);
   }
 });
 // Add business page
@@ -45,7 +47,36 @@ router.get('/add', async (req, res) => {
     res.status(500).render('error', { error });
   }
 });
+// ===================================
+// NEW: BUSINESS DETAIL PAGE ROUTE
+// ===================================
+router.get('/business/:id', async (req, res) => {
+    try {
+        const businessId = req.params.id;
 
+        // 1. Fetch the business details (this calls your stored procedure)
+        const business = await Business.getById(businessId);
+        
+        if (!business) {
+            // If no business is found, send a 404
+            return res.status(404).send('Business not found');
+        }
+
+        // 2. Fetch all reviews for this business
+        const reviews = await Review.getByBusinessId(businessId);
+
+        // 3. Render the new page, passing in both sets of data
+        res.render('businessDetail', {
+            title: `${business.name} | CityBiz Directory`,
+            business: business,
+            reviews: reviews,
+            currentPage: 'business' // For header styling
+        });
+
+    } catch (error) {
+        res.status(500).send('Server Error: ' + error.message);
+    }
+});
 // About us page
 router.get('/about', (req, res) => {
   res.render('aboutus');

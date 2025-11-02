@@ -1,0 +1,94 @@
+<%- include('partials/header', { title: title, currentPage: 'business', stylesheets: ['businessDetail.css'] }) %>
+
+<main class="detail-container">
+
+    <section class="detail-header">
+        <div class="header-image-gallery">
+            <img src="<%= business.image || 'https://placehold.co/800x400/eee/ccc?text=No+Image' %>" alt="<%= business.name %>">
+        </div>
+        <div class="header-info">
+            <span class="header-category"><%= business.category_name %></span>
+            <h1><%= business.name %></h1>
+            <div class="header-rating">
+                <span class="rating-stars">⭐ <%= business.avg_rating %></span>
+                <span class="review-count">(<%= business.review_count %> reviews)</span>
+            </div>
+            <div class="header-contact">
+                <p>📞 <%= business.phone %></p>
+                <p>📧 <%= business.email %></p>
+                <p>📍 <%= business.address %>, <%= business.city %>, <%= business.state %> <%= business.pincode %></p>
+            </div>
+            <div class="header-actions">
+                <a href="<%= business.website || '#' %>" class="btn-action" ${!business.website ? 'disabled' : ''}>🌐 Website</a>
+                <button class="btn-action" id="favorite-btn">❤️ Add to Favorites</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="detail-content">
+        
+        <div id="overview" class="detail-tab-content">
+            <h2>Overview</h2>
+            <p class="description"><%= business.description %></p>
+
+            <h3>Location</h3>
+            <div class="map-placeholder">Map will go here</div>
+
+            <h3>Operating Hours (Sample)</h3>
+            <ul class="hours-list">
+                <li><strong>Monday:</strong> 9:00 AM - 6:00 PM</li>
+                <li><strong>Tuesday:</strong> 9:00 AM - 6:00 PM</li>
+                <li><strong>Wednesday:</strong> 9:00 AM - 6:00 PM</li>
+                <li><strong>Thursday:</strong> 9:00 AM - 6:00 PM</li>
+                <li><strong>Friday:</strong> 9:00 AM - 8:00 PM</li>
+                <li><strong>Saturday:</strong> 10:00 AM - 4:00 PM</li>
+                <li><strong>Sunday:</strong> Closed</li>
+            </ul>
+        </div>
+
+        <div id="reviews" class="detail-tab-content">
+            <h2>Reviews</h2>
+
+            <div class="review-form-container">
+                <h3>Leave a Review</h3>
+                <form class="review-form" data-id="<%= business.business_id %>">
+                    <div class="form-group">
+                        <label>Rating:</label>
+                        <select name="rating" required>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Comment:</label>
+                        <textarea name="comment" rows="3" placeholder="Share your experience..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit-review">Submit Review</button>
+                </form>
+            </div>
+
+            <div class="review-list">
+                <% if (reviews && reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-author"><%= review.user_name %></span>
+                                <span class="review-rating">⭐ <%= review.rating %> / 5</span>
+                            </div>
+                            <p class="review-comment"><%= review.comment %></p>
+                            <span class="review-date"><%= new Date(review.created_at).toLocaleDateString() %></span>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No reviews yet. Be the first to leave one!</p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<%- include('partials/footer', { scripts: ['businessDetail.js'] }) %>
