@@ -13,17 +13,8 @@ if (!user) {
     if (user.role === 'admin') {
         window.location.href = '/admin';
     } else {
-        window.location.href = '/dashboard/viewer';
+        window.location.href = '/';
     }
-}
-// Helper function to convert file to Base64
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
 }
 
 // Helper function for image size validation
@@ -36,52 +27,46 @@ function checkSize(input) {
 
 // Add the submit event listener
 formElement.addEventListener("submit", async (e) => {
-  e.preventDefault();
+ const submitBtn = formElement.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
 
-  // 1. Get all form data
-  // This automatically picks up all your new fields:
-  // name, description, phone, email, website, address, city, state, pincode, and category_id
-  const formData = new FormData(e.target);
-  const newBiz = Object.fromEntries(formData.entries());
-
-  // 2. Convert the image to Base64
-  const file = formData.get('image');
-  if (file && file.size > 0) {
-    newBiz.image = await fileToBase64(file);
-  } else {
-    // Handle case where no file is selected (if not required)
-    newBiz.image = null; 
-  }
-
-  // 3. Get the auth token from localStorage (set during login)
+  // 1. Get auth token
   const token = localStorage.getItem('token');
   if (!token) {
     alert('You must be logged in to add a business.');
-    window.location.href = '/login'; // Redirect to login
+    window.location.href = '/login';
     return;
   }
 
-  // 4. REPLACED localStorage WITH A FETCH CALL
+  // 2. NEW: Use FormData to send the file and text
+  // This automatically handles 'multipart/form-data'
+  const formData = new FormData(e.target);
+  
+  // 3. NEW: Fetch call
   try {
     const response = await fetch('/api/businesses', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // Send the token for your auth middleware
+        // --- REMOVED 'Content-Type': 'application/json' ---
+        // The browser will set it automatically for FormData
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(newBiz) // Send all form data as JSON
+      body: formData // <-- Send formData directly
     });
 
     if (response.ok) {
       alert('Business submitted successfully! It is pending approval.');
       formElement.reset();
     } else {
-      // Get error message from the server
       const error = await response.json();
       alert(`Submission failed: ${error.message}`);
     }
   } catch (error) {
     console.error('Error submitting form:', error);
     alert('An error occurred. Please try again.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Business';
   }
 });

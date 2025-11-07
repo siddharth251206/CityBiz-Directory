@@ -1,0 +1,24 @@
+<%- include('partials/header', { title: 'My Profile', currentPage: 'profile', stylesheets: ['addbiz.css'] }) %>
+
+<main>
+    <!-- We reuse the 'form-section' style from addbiz.css -->
+    <section class="form-section">
+        <h2>My Profile</h2>
+        <p style="text-align: center; margin-bottom: 20px; color: var(--color-text-muted);">Update your personal information.</p>
+
+        <form id="profile-form">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" placeholder="e.g., 123-456-7890">
+
+            <button type="submit" id="save-btn">Save Changes</button>
+        </form>
+    </section>
+</main>
+
+<%- include('partials/footer', { scripts: ['profile.js'] }) %>

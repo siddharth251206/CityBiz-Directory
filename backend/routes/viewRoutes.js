@@ -163,4 +163,21 @@ router.get('/reviews', (req, res) => {
         currentPage: 'reviews' // For header styling
     });
 });
+
+router.get('/profile', (req, res) => {
+    // 1. Check if user is logged in (using the cookie data)
+    if (!res.locals.user) {
+        // Not logged in, redirect to login page
+        return res.redirect('/login');
+    }
+
+    // 2. User is logged in, render the page
+    // (This page is for ALL roles)
+    res.render('profile', {
+        title: 'My Profile',
+        currentPage: 'profile' // For header styling
+    });
+});
+
+
 module.exports = router;

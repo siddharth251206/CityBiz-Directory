@@ -4,7 +4,8 @@
  * @param {Array} businesses - An array of business objects.
  * @param {boolean} [append=false] - If true, adds cards. If false, replaces content.
  */
-function renderBusinesses(container, businesses, append = false) {
+function renderBusinesses(container, businesses, append = false, options = {}) {
+  const { showRemoveButton = false } = options;
   // If we are NOT appending, clear the container first.
   if (!append) {
     container.innerHTML = "";
@@ -23,16 +24,33 @@ function renderBusinesses(container, businesses, append = false) {
     const reviewCount = biz.review_count || 0; 
     const isOpen = Math.random() > 0.5; // Dummy data
     const imageUrl = biz.image || `https://placehold.co/200x250/eee/ccc?text=No+Image&font=lato`;
+   const actionButtons = [];
+    if (showRemoveButton) {
+        // Add the Remove button
+        actionButtons.push(
+            `<button class="card-btn-remove" data-favorite-id="${biz.favorite_id}">
+                Remove
+             </button>`
+        );
+    }
 
-    card.innerHTML = `
+    // Add the default buttons
+    actionButtons.push(
+        `<a href="${biz.website || '#'}" class="card-btn-website" ${!biz.website ? 'disabled' : ''}>Website</a>`,
+        `<a href="/business/${biz.business_id}" class="card-btn-details title">View Details</a>`
+    );
+    
+    // Join all button HTML strings together
+    const actionsHTML = actionButtons.join('');
+   card.innerHTML = `
       <div class="card-image">
         <img src="${imageUrl}" alt="${biz.name}">
       </div>
       <div class="card-content">
         <div class="card-header">
-          <h3 class="card-title">📍 ${biz.name}</h3>
+          <h3 class="card-title">${biz.name}</h3>
           <span class="card-status ${isOpen ? 'open' : 'closed'}">
-            ${isOpen ? '🟢 Open Now' : '🔴 Closed'}
+            ${isOpen ? 'Open Now' : 'Closed'}
           </span>
         </div>
         <div class="card-meta">
@@ -43,11 +61,9 @@ function renderBusinesses(container, businesses, append = false) {
           <span class="rating-stars">⭐ ${biz.avg_rating}</span>
           <span class="review-count">(${reviewCount} reviews)</span>
         </div>
-        <p class="card-address">📞 ${biz.phone} | 📍 ${biz.address}</p>
+        <p class="card-address">${biz.phone} | ${biz.address}</p>
         <div class="card-actions">
-          <a href="${biz.website || '#'}" class="card-btn-website" ${!biz.website ? 'disabled' : ''}>🌐 Website</a>
-          
-          <a href="/business/${biz.business_id}" class="card-btn-details title">View Details</a>
+          ${actionsHTML} 
         </div>
       </div>
     `;

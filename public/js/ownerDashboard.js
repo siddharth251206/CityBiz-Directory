@@ -21,54 +21,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- NEW: Function to render the special Owner Card ---
-    function renderOwnerCards(businesses) {
-        // Clear the "Loading..." message
-        businessListContainer.innerHTML = ''; 
-        
-        if (businesses.length === 0) {
-            businessListContainer.innerHTML = '<p class="empty-state">You have not added any businesses yet. Click "Add New Business" to get started!</p>';
-            return;
-        }
+function renderOwnerCards(businesses) {
+    businessListContainer.innerHTML = ''; 
 
-        businesses.forEach(biz => {
-            const card = document.createElement('div');
-            card.className = 'owner-card';
-
-            const imageUrl = biz.image || `https://placehold.co/200x250/eee/ccc?text=No+Image&font=lato`;            
-            // Note: biz.review_count and biz.favorite_count come from our new backend query
-            card.innerHTML = `
-                <div class="owner-card-image">
-                    <img src="${imageUrl}" alt="${biz.name}">
-                </div>
-                <div class="owner-card-content">
-                    <div class="owner-card-header">
-                        <h3 class="owner-card-title">${biz.name}</h3>
-                        <span class="status-tag ${biz.status}">${biz.status.toUpperCase()}</span>
-                    </div>
-                    
-                    <div class="owner-card-stats">
-                        <div class="stat-item">
-                            <strong>${biz.avg_rating}</strong>
-                            <span>(${biz.review_count} Reviews)</span>
-                        </div>
-                        <div class="stat-item">
-                            <strong>${biz.favorite_count}</strong>
-                            <span>Favorites</span>
-                        </div>
-                    </div>
-
-                    <div class="owner-card-actions">
-                        <a href="/edit/${biz.business_id}" class="btn-action-edit">Edit</a>
-                        <button class="btn-action-delete" data-id="${biz.business_id}">Delete</button>
-                    </div>
-                </div>
-            `;
-            businessListContainer.appendChild(card);
-        });
-
-        // Add event listeners for all new delete buttons
-        attachDeleteListeners();
+    if (businesses.length === 0) {
+        businessListContainer.innerHTML = `
+            <div class="empty-state">
+                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No Businesses">
+                <p>You haven’t added any businesses yet.<br>Click <b>Add New Business</b> to get started!</p>
+            </div>`;
+        return;
     }
+
+    businesses.forEach(biz => {
+        const card = document.createElement('div');
+        card.className = 'owner-card';
+
+        const imageUrl = biz.image || `https://placehold.co/400x250/eee/ccc?text=No+Image`;
+
+        card.innerHTML = `
+            <div class="owner-card-image">
+                <img src="${imageUrl}" alt="${biz.name}">
+            </div>
+
+            <div class="owner-card-content">
+                <div class="owner-card-header">
+                    <h3 class="owner-card-title">${biz.name}</h3>
+                    <span class="status-tag ${biz.status}">${biz.status.toUpperCase()}</span>
+                </div>
+
+                <div class="owner-card-stats">
+                    <div class="stat-item">
+                        ⭐ <strong>${biz.avg_rating || "0.0"}</strong>
+                        <span>(${biz.review_count || 0} Reviews)</span>
+                    </div>
+                    <div class="stat-item">
+                        ❤️ <strong>${biz.favorite_count || 0}</strong>
+                        <span>Favorites</span>
+                    </div>
+                </div>
+
+                <div class="owner-card-actions">
+                    <a href="/edit/${biz.business_id}" class="btn-action-edit">Edit</a>
+                    <button class="btn-action-delete" data-id="${biz.business_id}">Delete</button>
+                </div>
+            </div>
+        `;
+        businessListContainer.appendChild(card);
+    });
+
+    attachDeleteListeners();
+}
 
     // --- NEW: Function to handle delete button clicks ---
     function attachDeleteListeners() {

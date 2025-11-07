@@ -12,6 +12,8 @@ const container = document.getElementById("topbuss");
 const applyFiltersBtn = document.getElementById("applyFiltersBtn");
 const resultsHeading = document.getElementById("results-heading");
 const loadMoreBtn = document.getElementById("load-more-btn");
+const searchInputEl = document.getElementById("searchInput");
+const categorySelectEl = document.getElementById("filtercat");
 
 /**
  * Renders a specific "page" of businesses to the container.
@@ -93,6 +95,19 @@ function loadMore() {
 
 // --- INITIALIZE THE PAGE ---
 document.addEventListener("DOMContentLoaded", () => {
+    // --- NEW LOGIC: READ URL PARAMETERS ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('query');
+    const searchCategory = urlParams.get('category');
+
+    if (searchQuery) {
+        // If ?query=... is in the URL, put it in the search box
+        searchInputEl.value = searchQuery;
+    }
+    
+    if (searchCategory) {
+        // If ?category=... is in the URL, select it in the dropdown
+        categorySelectEl.value = searchCategory;}
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener("click", applyFilters);
     }

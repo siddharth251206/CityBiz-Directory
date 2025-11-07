@@ -7,7 +7,7 @@
             <p>From cafes to plumbers, we have you covered.</p>
             
             <form action="/search" method="GET" class="hero-search-form">
-                <input type="text" name="name" placeholder="What are you looking for?" class="hero-search-what">
+                <input type="text" name="query" placeholder="What are you looking for?" class="hero-search-what">
                 <button type="submit" class="hero-search-btn">Search</button>
             </form>
         </div>
@@ -18,7 +18,7 @@
         <div class="category-grid">
             <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
                 <% categories.forEach(category => { %>
-                  <a href="/search?categoryId=<%= category.category_id %>" class="category-card">
+                  <a href="/search?category=<%= encodeURIComponent(category.name) %>" class="category-card">
                     <span><%= category.name %></span>
                   </a>
                 <% }) %>

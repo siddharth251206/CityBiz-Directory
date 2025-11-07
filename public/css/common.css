@@ -55,13 +55,12 @@ a:hover {
     text-decoration: underline;
 }
 
-/* ================== */
-/* HEADER STYLING (FIXED) */
-/* ================== */
+/* --- NEW/UPDATED HEADER STYLES --- */
 
 .site-header {
     width: 100%;
-    padding: 16px 0;
+    /* Added a bit more padding for a modern, open feel */
+    padding: 0px 0; 
     background: var(--color-white);
     position: sticky;
     top: 0;
@@ -79,37 +78,96 @@ a:hover {
     align-items: center;
 }
 
+/* In public/css/common.css */
 #logo {
-    height: 40px;
-    filter: none; /* Remove inversion for light header */
+    max-height: 70px; /* Ensure it's never taller than 40px */
+    width: auto;     /* Let the width adjust proportionally */
+    display: block;  /* Keep it as a block for better layout control */
+    vertical-align: middle; /* Helps align with text if any */
 }
-
 .navbar .options {
-    color: var(--color-text-dark);
     list-style: none;
     display: flex;
-    gap: 24px;
+    align-items: center;
+    /* Increased gap for more spacing */
+    gap: 10px; 
 }
 
+/* Base style for ALL nav links */
 .navbar .options a {
     color: var(--color-text-muted);
     font-weight: 500;
     text-decoration: none;
-    padding: 8px 0;
-    border-bottom: 2px solid transparent;
+    /* Added horizontal padding for the hover/active "pill" */
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
     transition: all 0.2s ease;
+    /* Removed the old border-bottom */
 }
 
-.navbar .options a:hover,
-.navbar li#current a {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
+/* Hover state for INACTIVE links */
+.navbar .options a:hover {
+    color: var(--color-text-dark);
+    background-color: var(--color-secondary-light);
 }
+
+/* Active page link (the "pill") */
+.navbar li#current a {
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* --- NEW AUTH BUTTON STYLES --- */
 
 .navbar .auth-links {
+    /* Aligns the auth buttons together */
+    display: flex;
+    gap: 12px;
     margin-left: 40px;
 }
 
+/* Removes padding from the <li> so the button's <a> tag controls all spacing */
+.navbar .auth-links li {
+    padding: 0;
+}
+
+/* Base style for auth buttons */
+.navbar .auth-links a {
+    font-size: 0.9rem;
+    padding: 8px 16px; /* Button padding */
+    border: 1px solid transparent;
+}
+
+/* Style for Login/Register (Filled Button) */
+.navbar .auth-links a[href="/login"],
+.navbar .auth-links a[href="/register"] {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+}
+.navbar .auth-links a[href="/login"]:hover,
+.navbar .auth-links a[href="/register"]:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Style for Logout (Outline Button) */
+.navbar .auth-links a#logout-btn {
+    background-color: #fee2e2;
+    color: red;
+}
+.navbar .auth-links a#logout-btn:hover {
+    background-color: red;
+    color: var(--color-white);
+    border-color: var(--color-secondary-light);
+}
+
+/* --- END OF HEADER STYLES --- */
+
+/* ================== */
+/* FOOTER STYLING */
+/* ================== */
+/* (Keep all your existing footer styles below this line) */
 /* ================== */
 /* FOOTER STYLING */
 /* ================== */
@@ -388,13 +446,42 @@ footer {
     padding: 16px;
     cursor: pointer;
     font-weight: 600;
-    color: var(--color-text-dark);
+    color: var(--color-white);
     border-top: 1px solid var(--color-border);
     transition: background-color 0.2s ease;
 }
 
 .title:hover {
     background-color: var(--color-light-bg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cards {
+        margin-bottom: 1rem;
+    }
+    
+    .card-image {
+        height: 220px;
+    }
+    
+    .card-content {
+        padding: 16px 20px;
+    }
+    
+    .card-title {
+        font-size: 1.15rem;
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .card-btn-website,
+    .card-btn-details {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 

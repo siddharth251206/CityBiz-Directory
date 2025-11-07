@@ -63,10 +63,15 @@ exports.createBusiness = async (req, res, next) => {
     // 1. Get owner_id from the auth middleware
     const owner_id = req.user.id; 
 
-    // 2. Combine it with the form data from req.body
+    // 2. Combine it with the text data from req.body
     const businessData = { ...req.body, owner_id };
+
+    // 3. NEW: If a file was uploaded, add its URL
+    if (req.file) {
+      businessData.image = req.file.path; // 'path' is the Cloudinary URL
+    }
     
-    // 3. Call the updated model function
+    // 4. Call the model function
     const business = await Business.create(businessData);
     res.status(201).json(business);
   } catch (error) {
@@ -94,7 +99,9 @@ exports.updateBusiness = async (req, res, next) => {
 
     // This is the new data from the form
     const newData = req.body;
-
+if (req.file) {
+      newData.image = req.file.path;
+    }
     // --- 3. NEW HYBRID APPROVAL LOGIC ---
     if (req.user.role === 'owner') {
         // If an OWNER is making the change, check if it needs re-approval.

@@ -21,7 +21,11 @@ class Favorite {
     const [rows] = await db.query(sql, [userId]);
     return rows;
   }
-
+  // Get a single favorite entry by its ID
+static async getById(favoriteId) {
+    const [rows] = await db.query('SELECT * FROM Favorite WHERE favorite_id = ?', [favoriteId]);
+    return rows[0];
+  }
   // Remove a business from a user's favorites
   static async delete(favoriteId) {
     await db.query('DELETE FROM Favorite WHERE favorite_id = ?', [favoriteId]);

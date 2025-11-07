@@ -2,21 +2,23 @@
 
 /* Use the same container as the owner dashboard for consistency */
 .admin-container {
-    max-width: 900px; /* Admin list is simpler, so a bit narrower */
-    margin: 30px auto;
-    padding: 0 20px;
+    max-width: 1000px;
+    margin: 48px auto;
+    padding: 0 24px;
 }
 
 /* Header for the page */
 .admin-header {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--color-border);
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 3px solid var(--color-border);
 }
 
 .admin-header h1 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: var(--color-text-dark);
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 /* The list that holds all pending cards */
@@ -30,17 +32,18 @@
 /* ADMIN CARD STYLES */
 /* ================== */
 .admin-card {
-    background: var(--color-white);
+    background: linear-gradient(135deg, var(--color-white) 0%, #fafbfc 100%);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: 16px;
     box-shadow: var(--shadow-sm);
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
 .admin-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    border-color: #cbd5e1;
 }
 
 /* Card Header: Title and Category */
@@ -53,15 +56,18 @@
 }
 
 .admin-card-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.6rem;
+    font-weight: 700;
     color: var(--color-text-dark);
+    letter-spacing: -0.01em;
 }
 
 .admin-card-category {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #667eea;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* Card Body: Description, Status, etc. */
@@ -94,28 +100,33 @@
 }
 
 .btn-admin {
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
     border: none;
     color: var(--color-white);
     transition: all 0.3s ease;
+    letter-spacing: 0.01em;
 }
 
 .btn-admin.approve {
-    background-color: var(--color-accent-green);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 .btn-admin.approve:hover {
-    background-color: #047857; /* Darker green */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -3px rgba(16, 185, 129, 0.4);
 }
 
 .btn-admin.reject {
-    background-color: var(--color-accent-red);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
 }
 .btn-admin.reject:hover {
-    background-color: #b91c1c; /* Darker red */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -3px rgba(239, 68, 68, 0.4);
 }
 
 

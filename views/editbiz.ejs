@@ -1,9 +1,16 @@
 <%- include('partials/header', { title: 'Edit Business', currentPage: 'dashboard', stylesheets: ['addbiz.css'] }) %>
 <section class="form-section">
     <h2>Edit Business</h2>
-    
+    <!-- NEW: Add current image preview -->
+        <div class="form-group" id="image-preview-container" style="display: none;">
+            <label>Current Image:</label>
+            <img id="current-image" src="" alt="Current Business Image" style="width: 100%; max-width: 200px; border-radius: 8px; margin-top: 10px;">
+        </div>
     <form id="edit-business-form" data-id="<%= businessId %>">
         
+         <label for="image">Change Image (Optional):</label>
+            <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/jpg" onchange="checkSize(this)">
+
         <label for="biz-name">Business Name:</label>
         <input type="text" id="biz-name" name="name" required>
 
@@ -46,5 +53,4 @@
         <button type="submit">Save Changes</button>
     </form>
 </section>
-
 <%- include('partials/footer', { scripts: ['editbiz.js'] }) %>

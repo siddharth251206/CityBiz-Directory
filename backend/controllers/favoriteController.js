@@ -40,3 +40,27 @@ exports.removeFavorite = async (req, res, next) => {
     next(error);
   }
 };
+exports.removeFavorite = async (req, res, next) => {
+  try {
+    const favoriteId = req.params.favoriteId;
+    const userId = req.user.id; // Get ID from auth token
+
+    // --- NEW SECURITY CHECK ---
+    const favorite = await Favorite.getById(favoriteId);
+
+    if (!favorite) {
+      return res.status(404).json({ message: 'Favorite not found' });
+    }
+
+    if (favorite.user_id !== userId) {
+      // User is trying to delete someone else's favorite
+      return res.status(403).json({ message: 'User not authorized' });
+    }
+    // --- END SECURITY CHECK ---
+
+    await Favorite.delete(favoriteId);
+    res.json({ message: 'Favorite removed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
