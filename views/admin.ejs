@@ -1,0 +1,19 @@
+<%- include('partials/header', { title: title, currentPage: currentPage, stylesheets: ['admin.css'] }) %>
+
+<main class="admin-container">
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage pending business approvals.</p>
+    </div>
+
+    <section class="admin-content">
+        <h2>Pending Approvals</h2>
+        
+        <div class="admin-business-list" id="pending-list">
+            <p>Loading pending businesses...</p>
+        </div>
+    </section>
+
+</main>
+
+<%- include('partials/footer', { scripts: ['admin.js'] }) %>

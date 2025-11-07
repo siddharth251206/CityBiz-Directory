@@ -3,6 +3,8 @@ const router = express.Router();
 const Business = require('../models/businessModel');
 const Category = require('../models/categoryModel');
 const Review = require('../models/reviewModel');
+const { auth, isAdmin, isOwner } = require('../middleware/auth');
+const { isViewer } = require('../middleware/auth');
 // Home page
 router.get('/', async (req, res) => {
   try {
@@ -77,7 +79,23 @@ router.get('/business/:id', async (req, res) => {
         res.status(500).send('Server Error: ' + error.message);
     }
 });
-// About us page
+router.get('/edit/:id', async (req, res) => {
+    // We REMOVED 'auth' from this route
+    try {
+        // This route ONLY renders the page and gives it the categories
+        const categories = await Category.getAll();
+        
+        res.render('editbiz', {
+            title: 'Edit Business',
+            currentPage: 'dashboard',
+            categories: categories,
+            // We pass the businessId to the EJS file
+            businessId: req.params.id 
+        });
+    } catch (error) {
+        res.status(500).send('Server Error: ' + error.message);
+    }
+});// About us page
 router.get('/about', (req, res) => {
   res.render('aboutus');
 });
@@ -100,5 +118,49 @@ router.get('/dashboard/viewer', (req, res) => {
 //register
 router.get('/register', (req, res) => {
   res.render('register');
+});
+router.get('/admin', (req, res) => {
+    res.render('admin', {
+        title: 'Admin Dashboard',
+        currentPage: 'admin'
+    });
+});
+router.get('/favorites', (req, res) => {
+    // We check res.locals.user (which was set by the cookie middleware)
+    
+    // 1. Check if user is logged in
+    if (!res.locals.user) {
+        // Not logged in, redirect to login page
+        return res.redirect('/login');
+    }
+
+    // 2. Check if user has the correct role
+    if (res.locals.user.role !== 'viewer') {
+        // Logged in, but not a viewer. Send to homepage.
+        return res.redirect('/');
+    }
+
+    // 3. User is a logged-in viewer. Render the page.
+    res.render('favorites', {
+        title: 'My Favorites',
+        currentPage: 'favorites' // For header styling
+    });
+});
+router.get('/reviews', (req, res) => {
+    // 1. Check if user is logged in
+    if (!res.locals.user) {
+        return res.redirect('/login');
+    }
+
+    // 2. Check if user has the correct role
+    if (res.locals.user.role !== 'viewer') {
+        return res.redirect('/');
+    }
+
+    // 3. User is a logged-in viewer. Render the page.
+    res.render('my-reviews', {
+        title: 'My Reviews',
+        currentPage: 'reviews' // For header styling
+    });
 });
 module.exports = router;

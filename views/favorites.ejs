@@ -1,0 +1,19 @@
+<%- include('partials/header', { title: 'My Favorites', currentPage: 'favorites', stylesheets: ['favorites.css', 'searchbiz.css'] }) %>
+
+<main class="search-page-main">
+
+    <section class="search-banner">
+        <h1>My Favorites</h1>
+        <p>Your saved list of local gems. Easily find them again.</p>
+    </section>
+
+    <section class="results-area">
+        <h2 id="results-heading">Loading your saved businesses...</h2>
+        
+        <div class="business-grid" id="favorites-grid">
+            </div>
+    </section>
+
+</main>
+
+<%- include('partials/footer', { scripts: ['utils.js', 'favorites.js'] }) %>

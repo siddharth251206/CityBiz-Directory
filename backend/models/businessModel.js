@@ -78,11 +78,29 @@ class Business {
     return this.getById(result.insertId);
   }
 
-  // Update business
+// Update business
   static async update(id, businessData) {
-    // Does not allow updating owner_id or avg_rating directly
-    const { category_id, name, description, address, city, state, pincode, phone, email, website, status, image } = businessData;
+    // 1. Get the current business data from the DB
+    const currentBusiness = await this.getById(id);
+    if (!currentBusiness) {
+        throw new Error('Business not found');
+    }
+
+    // 2. Merge the existing data with the new (partial) data
+    // This preserves all old fields and updates new ones.
+    const dataToUpdate = {
+        ...currentBusiness, // Start with all old data
+        ...businessData     // Overwrite with any new data
+    };
+
+    // 3. Destructure the *final* merged data
+    // Now, category_id, name, etc., are all present
+    const { 
+        category_id, name, description, address, city, state, 
+        pincode, phone, email, website, status, image 
+    } = dataToUpdate;
     
+    // 4. Run the update query with the complete data
     const sql = `
       UPDATE Business SET 
       category_id = ?, name = ?, description = ?, address = ?, city = ?, state = ?, pincode = ?, 
@@ -91,12 +109,13 @@ class Business {
     `;
 
     await db.query(sql, [
-      category_id, name, description, address, city, state, pincode, phone, email, website, status || 'pending',image, id
+      category_id, name, description, address, city, state, pincode, 
+      phone, email, website, status, image, id
     ]);
     
+    // Return the new, fully updated business
     return this.getById(id);
   }
-
   // Delete business
   static async delete(id) {
     await db.query('DELETE FROM Business WHERE business_id = ?', [id]);
@@ -109,6 +128,40 @@ class Business {
     // The result will be in the final packet
     return rows[rows.length - 1][0]; 
   }
+
+  // Find all businesses by owner ID
+static async findByOwner(ownerId) {
+    // This query now gets category_name, favorite_count, AND review_count
+    const sql = `
+      SELECT 
+        b.*, 
+        c.name AS category_name,
+        (SELECT COUNT(*) FROM Favorite f WHERE f.business_id = b.business_id) AS favorite_count,
+        (SELECT COUNT(*) FROM Review r WHERE r.business_id = b.business_id) AS review_count
+      FROM Business b
+      JOIN Category c ON b.category_id = c.category_id
+      WHERE b.owner_id = ?
+      ORDER BY b.date_added DESC
+    `;
+    const [rows] = await db.query(sql, [ownerId]);
+    return rows;
+  }
+// Find all businesses with 'pending' status
+static async findPending() {
+  // We join with category to get the name, just like on the owner dashboard
+  const sql = `
+    SELECT 
+      b.*, 
+      c.name AS category_name,
+      (SELECT COUNT(*) FROM Review r WHERE r.business_id = b.business_id) AS review_count
+    FROM Business b
+    JOIN Category c ON b.category_id = c.category_id
+    WHERE b.status = 'pending'
+    ORDER BY b.date_added ASC
+  `;
+  const [rows] = await db.query(sql);
+  return rows;
+}
 }
 
 module.exports = Business;

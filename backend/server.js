@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const db = require('./db');
+const cookieParser = require('cookie-parser'); // <-- IMPORT THIS
+const userMiddleware = require('./middleware/userMiddleware'); // <-- IMPORT THIS
 
 // Load environment variables
 dotenv.config();
@@ -15,7 +17,11 @@ app.locals.cache = false;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // <-- ADD THIS
 app.use(express.static(path.join(__dirname, '../public')));
+
+// --- GLOBAL USER MIDDLEWARE ---
+app.use(userMiddleware); // <-- ADD THIS (runs on all routes)
 
 // View engine setup
 app.set('view engine', 'ejs');

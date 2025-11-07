@@ -48,3 +48,13 @@ exports.deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+// Get all reviews for the logged-in user
+exports.getUserReviews = async (req, res, next) => {
+  try {
+    // req.user.id comes from the 'auth' middleware
+    const reviews = await Review.getByUserId(req.user.id);
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};

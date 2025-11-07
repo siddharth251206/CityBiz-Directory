@@ -1,5 +1,21 @@
 let formElement = document.getElementById("business-form");
+const user = JSON.parse(localStorage.getItem('user'));
 
+if (!user) {
+    // Not logged in
+    alert('You must be logged in to access this page.');
+    window.location.href = '/login';
+} else if (user.role !== 'owner') {
+    // Logged in, but NOT an owner
+    alert('Access Denied: Only Business Owners can add a new business.');
+    
+    // Send them to their appropriate dashboard
+    if (user.role === 'admin') {
+        window.location.href = '/admin';
+    } else {
+        window.location.href = '/dashboard/viewer';
+    }
+}
 // Helper function to convert file to Base64
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {

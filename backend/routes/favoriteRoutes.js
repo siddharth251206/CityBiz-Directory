@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const favoriteController = require('../controllers/favoriteController');
-const auth = require('../middleware/auth'); // Import auth middleware
+const { auth } = require('../middleware/auth'); // Import auth middleware
 
 // All favorite routes should be protected
 

@@ -1,0 +1,128 @@
+/* public/css/my-reviews.css */
+
+/* Banner (reusing search page style) */
+.review-banner {
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-light-bg) 100%);
+    color: var(--color-text-dark);
+    padding: 60px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+    position: relative;
+}
+
+.review-banner h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.review-banner p {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Review List */
+.review-list-container {
+    max-width: 900px;
+    margin: 48px auto;
+    padding: 0 20px;
+}
+
+.review-list-container h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--color-text-dark);
+}
+
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Single Review Card */
+.review-card-mybiz {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.review-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.review-card-title a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.review-card-title a:hover {
+    text-decoration: underline;
+}
+
+.review-card-rating {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-accent-amber);
+}
+
+.review-card-comment {
+    padding: 24px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.review-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: var(--color-light-bg);
+    border-top: 1px solid var(--color-border);
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
+.review-card-date {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.btn-delete-review {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid var(--color-accent-red);
+    background-color: var(--color-white);
+    color: var(--color-accent-red);
+    transition: all 0.3s ease;
+}
+
+.btn-delete-review:hover {
+    background-color: var(--color-accent-red);
+    color: var(--color-white);
+}
+
+/* Shared empty state */
+.empty-state {
+    padding: 60px 40px;
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+}

@@ -1,0 +1,22 @@
+<%- include('partials/header', { title: 'My Reviews', currentPage: 'reviews', stylesheets: ['my-reviews.css'] }) %>
+
+<main class="review-page-main">
+
+    <!-- 1. BANNER -->
+    <section class="review-banner">
+        <h1>My Reviews</h1>
+        <p>A list of all the reviews you've written.</p>
+    </section>
+
+    <!-- 2. RESULTS AREA -->
+    <section class="review-list-container">
+        <h2 id="results-heading">Loading your reviews...</h2>
+        
+        <div class="review-list" id="review-list">
+            <!-- Review cards will be rendered here by JS -->
+        </div>
+    </section>
+
+</main>
+
+<%- include('partials/footer', { scripts: ['my-reviews.js'] }) %>

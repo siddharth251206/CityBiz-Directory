@@ -51,7 +51,18 @@ class Review {
     const [rows] = await db.query('SELECT * FROM Review WHERE review_id = ?', [id]);
     return rows[0];
   }
-  
+  // Get all reviews by a specific user ID
+  static async getByUserId(userId) {
+    const [rows] = await db.query(
+      `SELECT r.*, b.name AS business_name 
+       FROM Review r 
+       JOIN Business b ON r.business_id = b.business_id 
+       WHERE r.user_id = ? 
+       ORDER BY r.created_at DESC`,
+      [userId]
+    );
+    return rows;
+  }
 }
 
 module.exports = Review;

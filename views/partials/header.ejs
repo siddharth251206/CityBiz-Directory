@@ -3,25 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'CityBiz Directory' %></title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/common.css">
-
-    <% if (typeof stylesheets !== 'undefined') { %>
-        <% stylesheets.forEach(function(stylesheet) { %>
-            <link rel="stylesheet" href="/css/<%= stylesheet %>">
-        <% }); %>  <% } %>
-    </head>
+    <!-- Dynamically insert other stylesheets -->
+    <% if (typeof stylesheets !== 'undefined' && stylesheets) { %>
+        <% stylesheets.forEach(sheet => { %>
+            <link rel="stylesheet" href="/css/<%= sheet %>">
+        <% }) %>
+    <% } %>
+</head>
 <body>
-    <div class="gradient-bg"></div>
     <header class="site-header">
         <div class="header-container">
-            <img src="/images/logo.png" alt="Logo" id="logo">
+            <a href="/">
+                <img src="https://placehold.co/150x40/1e293b/ffffff?text=CityBiz&font=lato" id="logo" alt="CityBiz Logo">
+            </a>
             <nav class="navbar">
                 <ul class="options">
-                    <li <%= currentPage === 'home' ? 'id="current"' : '' %>><a href="/">HOME</a></li>
-                    <li <%= currentPage === 'search' ? 'id="current"' : '' %>><a href="/search">SEARCH BUSINESSES</a></li>
-                    <li <%= currentPage === 'add' ? 'id="current"' : '' %>><a href="/add">ADD BUSINESSES</a></li>
-                    <li <%= currentPage === 'about' ? 'id="current"' : '' %>><a href="/about">ABOUT US</a></li>
+                    
+                    <!-- === SHARED PUBLIC LINKS === -->
+                    <li id="<%= currentPage === 'home' ? 'current' : '' %>">
+                        <a href="/">HOME</a>
+                    </li>
+                    <li id="<%= currentPage === 'search' ? 'current' : '' %>">
+                        <a href="/search">SEARCH</a>
+                    </li>
+                    <% if (locals.user.role === 'viewer') { %>
+                            <li id="<%= currentPage === 'favorites' ? 'current' : '' %>">
+                                <a href="/favorites">MY FAVORITES</a> </li>
+                                <li id="<%= currentPage === 'reviews' ? 'current' : '' %>">
+                                <a href="/reviews">MY REVIEWS</a> 
+                            </li>
+                            <% } %>
+                    <li id="<%= currentPage === 'about' ? 'current' : '' %>">
+                        <a href="/about">ABOUT</a>
+                    </li>
+
+                    <!-- === DYNAMIC USER LINKS === -->
+                    <% if (locals.user) { %>
+                        
+                        <!-- 1. ADMIN NAVBAR -->
+                        <% if (locals.user.role === 'admin') { %>
+                            <li id="<%= currentPage === 'admin' ? 'current' : '' %>">
+                                <a href="/admin">ADMIN DASH</a>
+                            </li>
+                        <% } %>
+
+                        <!-- 2. OWNER NAVBAR -->
+                        <% if (locals.user.role === 'owner') { %>
+                            <li id="<%= currentPage === 'dashboard' ? 'current' : '' %>">
+                                <a href="/dashboard/owner">MY DASHBOARD</a>
+                            </li>
+                            <li id="<%= currentPage === 'add' ? 'current' : '' %>">
+                                <a href="/add">ADD BUSINESS</a>
+                            </li>
+                        <% } %>
+
+                        <!-- 3. VIEWER NAVBAR -->
+                        <% if (locals.user.role === 'viewer') { %>
+                            <!-- (We will add /favorites and /reviews here in Part 2) -->
+                        <% } %>
+
+                        <!-- LOGOUT (for all logged-in users) -->
+                        <li class="auth-links">
+                            <a href="#" id="logout-btn">LOGOUT</a>
+                        </li>
+
+                    <% } else { %>
+                        
+                        <!-- 4. GUEST NAVBAR (Logged Out) -->
+                        <li class="auth-links" id="<%= currentPage === 'login' ? 'current' : '' %>">
+                            <a href="/login">LOGIN</a>
+                        </li>
+                        <li id="<%= currentPage === 'register' ? 'current' : '' %>">
+                            <a href="/register">REGISTER</a>
+                        </li>
+                    <% } %>
                 </ul>
             </nav>
         </div>

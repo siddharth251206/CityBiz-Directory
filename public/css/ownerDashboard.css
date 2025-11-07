@@ -1,0 +1,163 @@
+/* public/css/ownerDashboard.css */
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--color-border);
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    color: var(--color-text-dark);
+}
+
+.btn-add-new {
+    padding: 12px 20px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+.btn-add-new:hover {
+    background: var(--color-primary-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.dashboard-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* This is the grid for your owner cards */
+.business-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Stack them in a list */
+    gap: 20px;
+}
+
+/* ================== */
+/* OWNER CARD STYLES */
+/* ================== */
+.owner-card {
+    display: flex;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.owner-card-image {
+    width: 200px;
+    flex-shrink: 0;
+}
+.owner-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.owner-card-content {
+    padding: 20px 24px;
+    flex-grow: 1;
+}
+
+.owner-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.owner-card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* The new status tag */
+.status-tag {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 15px;
+    text-transform: uppercase;
+}
+.status-tag.pending {
+    background-color: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+.status-tag.approved {
+    background-color: #ecfdf5;
+    color: #059669;
+    border: 1px solid #bbf7d0;
+}
+.status-tag.suspended {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Stats section */
+.owner-card-stats {
+    display: flex;
+    gap: 24px;
+    margin: 15px 0;
+    padding: 15px 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+.stat-item {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+.stat-item strong {
+    color: var(--color-text-dark);
+    font-size: 1.2rem;
+}
+
+/* Owner action buttons */
+.owner-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+.btn-action-edit,
+.btn-action-delete {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+.btn-action-edit {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+.btn-action-edit:hover {
+    background-color: var(--color-primary-dark);
+}
+.btn-action-delete {
+    background-color: var(--color-white);
+    color: var(--color-accent-red);
+    border-color: var(--color-accent-red);
+}
+.btn-action-delete:hover {
+    background-color: var(--color-accent-red);
+    color: var(--color-white);
+}

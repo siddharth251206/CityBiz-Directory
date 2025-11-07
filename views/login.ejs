@@ -81,7 +81,7 @@
                 if (response.ok) {
                     localStorage.setItem('token', result.token);
                     localStorage.setItem('user', JSON.stringify(result.user));
-                    window.location.href = result.user.role === 'owner' ? '/dashboard/owner' : '/dashboard/viewer';
+                    window.location.href = result.user.role === 'owner' ? '/dashboard/owner' : '/';                
                 } else {
                     alert(result.message);
                 }

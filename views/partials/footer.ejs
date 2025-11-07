@@ -12,8 +12,12 @@
     <p>&copy; 2025 CityBiz Directory. All Rights Reserved.</p>
 </footer>
 
+<script src="/js/globalAuth.js"></script>
+
 <% if (typeof scripts !== 'undefined') { %>
     <% scripts.forEach(function(script) { %>
         <script src="/js/<%= script %>"></script>
-    <% }); %>  <% } %>      </body>
+    <% }); %>
+<% } %>
+      </body>
 </html>

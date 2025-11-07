@@ -77,14 +77,54 @@ exports.createBusiness = async (req, res, next) => {
 // Update business
 exports.updateBusiness = async (req, res, next) => {
   try {
-    const business = await Business.getById(req.params.id);
+    const businessId = req.params.id;
     
-    // SECURITY CHECK: Ensure user is the owner
-    if (business.owner_id !== req.user.id) {
+    // 1. Get the business's current data
+    const business = await Business.getById(businessId);
+    
+    if (!business) {
+        return res.status(404).json({ message: 'Business not found' });
+    }
+
+    // --- 2. SECURITY CHECK ---
+    // User must be the owner OR an admin
+    if (business.owner_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'User not authorized to update this business' });
     }
 
-    const updatedBusiness = await Business.update(req.params.id, req.body);
+    // This is the new data from the form
+    const newData = req.body;
+
+    // --- 3. NEW HYBRID APPROVAL LOGIC ---
+    if (req.user.role === 'owner') {
+        // If an OWNER is making the change, check if it needs re-approval.
+        
+        // Check if critical fields are being changed
+        const nameChanged = newData.name && newData.name !== business.name;
+        const descChanged = newData.description && newData.description !== business.description;
+        // Use '!=' for category_id since it's a number, not a string
+        const categoryChanged = newData.category_id && newData.category_id != business.category_id;
+
+        if (nameChanged || descChanged || categoryChanged) {
+            // A critical field was changed, force re-approval
+            newData.status = 'pending';
+        } else {
+            // A minor field (like phone/address) was changed.
+            // We preserve the current status (e.g., 'approved').
+            newData.status = business.status;
+        }
+        
+    } else if (req.user.role === 'admin') {
+        // If an ADMIN is making the change (e.g., approving)
+        // We trust their input. If they don't provide a status,
+        // we keep the old one to be safe.
+        newData.status = newData.status || business.status;
+    }
+    // --- END NEW LOGIC ---
+
+    // 4. Send the final data to the model
+    // The model will merge this with the existing data
+    const updatedBusiness = await Business.update(businessId, newData);
     res.json(updatedBusiness);
   } catch (error) {
     next(error);
@@ -105,6 +145,47 @@ exports.deleteBusiness = async (req, res, next) => {
 
     await Business.delete(req.params.id);
     res.json({ message: 'Business deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+// Get all businesses for the logged-in owner
+exports.getMyBusinesses = async (req, res, next) => {
+  try {
+    // req.user.id comes from the 'auth' middleware
+    const businesses = await Business.findByOwner(req.user.id); 
+    res.json(businesses);
+  } catch (error) {
+    next(error);
+  }
+};
+// Fetches data for the edit form IF the user is the owner
+exports.getBusinessDataForEdit = async (req, res, next) => {
+    try {
+        const businessId = req.params.id;
+        const business = await Business.getById(businessId);
+
+        if (!business) {
+            return res.status(404).json({ message: 'Business not found' });
+        }
+
+        // SECURITY CHECK: Is the logged-in user the owner?
+        if (business.owner_id !== req.user.id) {
+            return res.status(403).json({ message: 'Access Denied: You do not own this business.' });
+        }
+        
+        // User is authorized, send the data
+        res.json(business);
+
+    } catch (error) {
+        next(error);
+    }
+};
+// Get all pending businesses (Admin Only)
+exports.getPendingBusinesses = async (req, res, next) => {
+  try {
+    const businesses = await Business.findPending();
+    res.json(businesses);
   } catch (error) {
     next(error);
   }

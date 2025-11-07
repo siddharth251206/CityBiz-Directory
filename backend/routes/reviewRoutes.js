@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const reviewController = require('../controllers/reviewController');
-const auth = require('../middleware/auth'); // Import auth middleware
-
+const { auth } = require('../middleware/auth'); // Import auth middleware
+// GET /api/reviews/my-reviews
+// Gets all reviews for the currently logged-in user
+router.get('/my-reviews', auth, reviewController.getUserReviews);
 // GET /api/reviews/business/:businessId
 // Gets all reviews for a specific business
 router.get('/business/:businessId', reviewController.getReviewsByBusiness);
