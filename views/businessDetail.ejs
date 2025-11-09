@@ -31,9 +31,6 @@
             <h2>Overview</h2>
             <p class="description"><%= business.description %></p>
 
-            <h3>Location</h3>
-            <div class="map-placeholder">Map will go here</div>
-
             <h3>Operating Hours (Sample)</h3>
             <ul class="hours-list">
                 <li><strong>Monday:</strong> 9:00 AM - 6:00 PM</li>
@@ -46,40 +43,47 @@
             </ul>
         </div>
 
-        <div id="reviews" class="detail-tab-content">
-            <h2>Reviews</h2>
+        <div class="review-form-container" 
+             data-id="<%= business.business_id %>" 
+             data-owner-id="<%= business.owner_id %>">
+            
+            <h3 id="leave-review-title">Leave a Review</h3>
+            <h3 id="customer-reviews-title" style="display: none;">Reviews by Customers</h3>
 
-            <div class="review-form-container">
-                <h3>Leave a Review</h3>
-                <form class="review-form" data-id="<%= business.business_id %>">
-                    <div class="form-group">
-                        <label>Rating:</label>
-                        <select name="rating" required>
-                            <option value="5">5 Stars</option>
-                            <option value="4">4 Stars</option>
-                            <option value="3">3 Stars</option>
-                            <option value="2">2 Stars</option>
-                            <option value="1">1 Star</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Comment:</label>
-                        <textarea name="comment" rows="3" placeholder="Share your experience..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-submit-review">Submit Review</button>
-                </form>
-            </div>
+            <form class="review-form">
+                <div class="form-group">
+                    <label for="rating">Rating (1-5):</label>
+                    <select id="rating" name="rating" required>
+                        <option value="" disabled selected>Select a rating</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Your review:</label>
+                    <textarea id="comment" name="comment" rows="4" placeholder="Share your experience..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit-review">Submit Review</button>
+            </form>
+        </div>
 
-            <div class="review-list">
-                <% if (reviews && reviews.length > 0) { %>
+        <div class="detail-tab-content">
+            <h2>All Reviews</h2>
+            <div class="review-list" id="review-list-container">
+                <% if (reviews.length > 0) { %>
                     <% reviews.forEach(review => { %>
                         <div class="review-card">
                             <div class="review-header">
                                 <span class="review-author"><%= review.user_name %></span>
-                                <span class="review-rating">⭐ <%= review.rating %> / 5</span>
+                                <span class="review-rating">⭐ <%= review.rating %>.0</span>
                             </div>
                             <p class="review-comment"><%= review.comment %></p>
-                            <span class="review-date"><%= new Date(review.created_at).toLocaleDateString() %></span>
+                            <span class="review-date">
+                                Posted on <%= new Date(review.created_at).toLocaleDateString() %>
+                            </span>
                         </div>
                     <% }) %>
                 <% } else { %>
@@ -88,7 +92,6 @@
             </div>
         </div>
     </section>
-
 </main>
 
 <%- include('partials/footer', { scripts: ['businessDetail.js'] }) %>

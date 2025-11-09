@@ -162,7 +162,8 @@ body {
     margin-top: 10px;
 }
 .btn-action-edit,
-.btn-action-delete {
+.btn-action-delete,
+.btn-view-details {
     padding: 8px 16px;
     border-radius: 8px;
     font-weight: 600;
@@ -177,6 +178,16 @@ body {
 }
 .btn-action-edit:hover {
     transform: scale(1.05);
+    color: white;
+    text-decoration: none;
+}
+.btn-view-details {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+.btn-view-details:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
     color: white;
     text-decoration: none;
 }

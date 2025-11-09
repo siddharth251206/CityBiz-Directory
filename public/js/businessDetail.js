@@ -1,7 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const reviewFormContainer = document.querySelector('.review-form-container');
     const reviewForm = document.querySelector('.review-form');
     const favoriteBtn = document.getElementById('favorite-btn');
+    const leaveReviewTitle = document.getElementById('leave-review-title');
+    const customerReviewsTitle = document.getElementById('customer-reviews-title');
+
+    // --- NEW LOGIC: CHECK IF USER IS THE OWNER ---
+    const loggedInUser = JSON.parse(localStorage.getItem('user')); // Get logged-in user from localStorage
+    const businessOwnerId = reviewFormContainer.dataset.ownerId; // Get owner ID from HTML data attribute
+
+    // Check if a user is logged in AND if their user_id matches the business owner's ID
+    if (loggedInUser && loggedInUser.user_id == businessOwnerId) {
+        // User is the owner!
+        if (reviewForm) {
+            reviewForm.style.display = 'none'; // Hide the review form
+        }
+        if (favoriteBtn) {
+            favoriteBtn.style.display = 'none'; // Hide the favorite button
+        }
+        if (leaveReviewTitle) {
+            leaveReviewTitle.style.display = 'none'; // Hide "Leave a Review" title
+        }
+        if (customerReviewsTitle) {
+            customerReviewsTitle.style.display = 'block'; // Show "Reviews by Customers" title
+        }
+    }
+    // --- END NEW LOGIC ---    
 
     // 1. Handle Review Form Submission
     if (reviewForm) {

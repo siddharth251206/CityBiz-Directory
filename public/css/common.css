@@ -295,19 +295,19 @@ footer {
   letter-spacing: 0.5px;
 }
 
-.card-status-open {
+.open {
   background-color: #ecfdf5;
   color: var(--color-accent-green);
   border: 1px solid #bbf7d0;
 }
 
-.card-status-closed {
+.closed {
   background-color: #fef2f2;
   color: var(--color-accent-red);
   border: 1px solid #fecaca;
 }
 
-.card-status-pending {
+.card-status .pending {
   background-color: #fffbeb;
   color: var(--color-accent-amber);
   border: 1px solid #fed7aa;

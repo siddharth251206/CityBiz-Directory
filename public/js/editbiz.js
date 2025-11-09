@@ -1,7 +1,7 @@
 
 function checkSize(input) {
-  if (input.files[0] && input.files[0].size > 100 * 1024) { // Or whatever your limit is
-    alert("Please upload an image under 100KB.");
+  if (input.files[0] && input.files[0].size > 2048 * 1024) { // Or whatever your limit is
+    alert("Please upload an image under 2MB.");
     input.value = "";
   }
 }

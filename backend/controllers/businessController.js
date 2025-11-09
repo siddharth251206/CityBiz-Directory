@@ -146,10 +146,9 @@ exports.deleteBusiness = async (req, res, next) => {
     if (!business) {
       return res.status(404).json({ message: 'Business not found' });
     }
-    if (business.owner_id !== req.user.id) {
+    if (business.owner_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'User not authorized to delete this business' });
     }
-
     await Business.delete(req.params.id);
     res.json({ message: 'Business deleted successfully' });
   } catch (error) {

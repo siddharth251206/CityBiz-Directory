@@ -63,6 +63,7 @@ function renderOwnerCards(businesses) {
 
                 <div class="owner-card-actions">
                     <a href="/edit/${biz.business_id}" class="btn-action-edit">Edit</a>
+                    <a href="/business/${biz.business_id}" class="btn-view-details" target="_blank">View Details</a>
                     <button class="btn-action-delete" data-id="${biz.business_id}">Delete</button>
                 </div>
             </div>
