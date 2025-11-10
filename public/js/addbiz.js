@@ -27,6 +27,7 @@ function checkSize(input) {
 
 // Add the submit event listener
 formElement.addEventListener("submit", async (e) => {
+  e.preventDefault();
  const submitBtn = formElement.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting...';
