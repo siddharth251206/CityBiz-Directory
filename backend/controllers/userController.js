@@ -8,34 +8,36 @@ exports.register = async (req, res, next) => {
   try {
     const { name, email, password, role, phone } = req.body;
 
-    const existingUser = await User.findByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and password are required"
+      });
     }
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const result = await User.register({
-      name,
-      email,
-      password: hashed,
-      role: role || "viewer",
-      phone
-    });
+    const result = await User.register({ name, email, password: hashed, role, phone });
 
-    if (!result.user_id) {
-      return res.status(400).json({ message: result.message });
-    }
+if (!result.user_id) {
+  return res.status(400).json({ success: false, message: result.message });
+}
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: result
-    });
+return res.status(201).json({
+  success: true,
+  message: result.message,
+  user_id: result.user_id
+});
+
 
   } catch (err) {
-    next(err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error during registration"
+    });
   }
 };
+
 
 // LOGIN
 exports.login = async (req, res, next) => {

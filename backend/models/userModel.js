@@ -9,34 +9,39 @@ class User {
   //  Uses PostgreSQL stored function: sp_register_user()
   // ======================================================
   static async register(userData) {
-    const { name, email, password, role, phone } = userData;
+  const { name, email, password, role, phone } = userData;
 
-    const sql = `
-      SELECT * FROM sp_register_user($1, $2, $3, $4, $5)
-    `;
+  const sql = `
+    SELECT sp_register_user($1, $2, $3, $4, $5) AS result
+  `;
 
-    const result = await db.query(sql, [
-      name,
-      email,
-      password,           // hashed already in controller
-      role || "viewer",
-      phone
-    ]);
+  const result = await db.query(sql, [
+    name,
+    email,
+    password,
+    role || "viewer",
+    phone
+  ]);
 
-    const row = result.rows[0];
-    if (!row.user_id) {
-      return { user_id: null, message: row.message };
-    }
+  const payload = result.rows[0].result;
 
+  if (!payload.user_id) {
     return {
-      user_id: row.user_id,
-      name,
-      email,
-      role: role || "viewer",
-      phone,
-      message: row.message
+      user_id: null,
+      message: payload.error || payload.message
     };
   }
+
+  return {
+    user_id: payload.user_id,
+    name,
+    email,
+    role: role || "viewer",
+    phone,
+    message: payload.message
+  };
+}
+
 
 
   // ======================================================
