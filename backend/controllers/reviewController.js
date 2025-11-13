@@ -1,60 +1,110 @@
+// controllers/reviewController.js
 const Review = require('../models/reviewModel');
 
-// Create review
-exports.createReview = async (req, res, next) => {
+/**
+ * Handles all review endpoints.
+ * PostgreSQL + Supabase compatible.
+ */
+
+// Add Review
+exports.addReview = async (req, res, next) => {
   try {
-    // Get user_id from the authenticated user
-    const user_id = req.user.id;
-    // Get review data from the form body
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
+    }
+
     const { business_id, rating, comment } = req.body;
 
-    const reviewData = { user_id, business_id, rating, comment };
-    
-    const review = await Review.create(reviewData);
-    res.status(201).json({ message: 'Review created successfully', review });
+    if (!business_id || !rating) {
+      return res.status(400).json({ message: 'business_id and rating required' });
+    }
+
+    const review = await Review.addReview(userId, business_id, rating, comment);
+    return res.status(201).json(review);
   } catch (error) {
     next(error);
   }
 };
 
-// Get reviews by business ID
-exports.getReviewsByBusiness = async (req, res, next) => {
+// Update Review
+exports.updateReview = async (req, res, next) => {
   try {
-    const reviews = await Review.getByBusinessId(req.params.businessId);
-    res.json(reviews);
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
+    }
+
+    const reviewId = parseInt(req.params.id, 10);
+    if (Number.isNaN(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review id' });
+    }
+
+    const { rating, comment } = req.body;
+
+    const updated = await Review.updateReview(reviewId, userId, rating, comment);
+    return res.json(updated);
   } catch (error) {
     next(error);
   }
 };
 
-// Delete review (SECURED)
+// Delete Review
 exports.deleteReview = async (req, res, next) => {
   try {
-    const reviewId = req.params.reviewId; // Use reviewId from route
-    const review = await Review.getById(reviewId); // (You'll need to add getById to reviewModel)
-
-    if (!review) {
-      return res.status(404).json({ message: 'Review not found' });
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
     }
 
-    // SECURITY CHECK: Ensure user owns this review
-    if (review.user_id !== req.user.id) {
-      return res.status(403).json({ message: 'User not authorized to delete this review' });
+    const reviewId = parseInt(req.params.id, 10);
+    if (Number.isNaN(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review id' });
     }
 
-    await Review.delete(reviewId);
-    res.json({ message: 'Review deleted successfully' });
+    const deleted = await Review.deleteReview(reviewId, userId);
+    return res.json(deleted);
   } catch (error) {
     next(error);
   }
 };
-// Get all reviews for the logged-in user
-exports.getUserReviews = async (req, res, next) => {
+
+// Get all reviews for a business
+exports.getReviewsByBusiness = async (req, res, next) => {
   try {
-    // req.user.id comes from the 'auth' middleware
-    const reviews = await Review.getByUserId(req.user.id);
-    res.json(reviews);
+    const businessId = parseInt(req.params.id, 10);
+    if (Number.isNaN(businessId)) {
+      return res.status(400).json({ message: 'Invalid business id' });
+    }
+
+    const reviews = await Review.getAllByBusinessId(businessId);
+    return res.json(reviews);
   } catch (error) {
     next(error);
+  }
+};
+
+// Get all reviews by a user
+exports.getReviewsByUser = async (req, res, next) => {
+  try {
+    // const userId = parseInt(req.params.id, 10);
+    // if (Number.isNaN(userId)) {
+    //   return res.status(400).json({ message: 'Invalid user id' });
+    // }
+
+    const reviews = await Review.getByUserId(req.user.user_id);
+    return res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getAllByBusinessId = async (req, res, next) => {
+  try {
+    const businessId = req.params.businessId;
+    const reviews = await Review.getAllByBusinessId(businessId);
+    return res.json(reviews);
+  } catch (err) {
+    next(err);
   }
 };

@@ -1,65 +1,61 @@
+// controllers/favoriteController.js
 const Favorite = require('../models/favoriteModel');
 
-// Get all favorites for the logged-in user
-exports.getUserFavorites = async (req, res, next) => {
-  try {
-    const favorites = await Favorite.getByUserId(req.user.id);
-    res.json(favorites);
-  } catch (error) {
-    next(error);
-  }
-};
-//add fav
+/**
+ * Controller for Favorite operations
+ * PostgreSQL-safe + consistent return structures
+ */
+
+// Add to favorites
 exports.addFavorite = async (req, res, next) => {
   try {
-    const favoriteData = {
-      user_id: req.user.id, // Get user_id from auth token
-      business_id: req.body.business_id 
-    };
-
-    // Check if it's already favorited
-    const isAlreadyFavorited = await Favorite.isFavorited(favoriteData.user_id, favoriteData.business_id);
-    if (isAlreadyFavorited) {
-        return res.status(400).json({ message: 'Already in favorites' });
+    const userId = req.user?.user_id; // From auth middleware
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
     }
 
-    const favorite = await Favorite.create(favoriteData);
-    res.status(201).json({ message: 'Favorite added', favorite });
+    const { business_id } = req.body;
+    if (!business_id) {
+      return res.status(400).json({ message: 'business_id is required' });
+    }
+
+    const favorite = await Favorite.addFavorite(userId, business_id);
+    return res.status(201).json(favorite);
   } catch (error) {
     next(error);
   }
 };
-// Remove a favorite
+
+// Remove favorite
 exports.removeFavorite = async (req, res, next) => {
   try {
-    const favoriteId = req.params.favoriteId;
-    // (You should add a security check here to ensure req.user.id owns this favorite)
-    await Favorite.delete(favoriteId);
-    res.json({ message: 'Favorite removed successfully' });
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
+    }
+
+    const businessId = parseInt(req.params.id, 10);
+    if (Number.isNaN(businessId)) {
+      return res.status(400).json({ message: 'Invalid business id' });
+    }
+
+    const removed = await Favorite.removeFavorite(userId, businessId);
+    return res.json(removed);
   } catch (error) {
     next(error);
   }
 };
-exports.removeFavorite = async (req, res, next) => {
+
+// Get all favorites of logged-in user
+exports.getUserFavorites = async (req, res, next) => {
   try {
-    const favoriteId = req.params.favoriteId;
-    const userId = req.user.id; // Get ID from auth token
-
-    // --- NEW SECURITY CHECK ---
-    const favorite = await Favorite.getById(favoriteId);
-
-    if (!favorite) {
-      return res.status(404).json({ message: 'Favorite not found' });
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized user' });
     }
 
-    if (favorite.user_id !== userId) {
-      // User is trying to delete someone else's favorite
-      return res.status(403).json({ message: 'User not authorized' });
-    }
-    // --- END SECURITY CHECK ---
-
-    await Favorite.delete(favoriteId);
-    res.json({ message: 'Favorite removed successfully' });
+    const favorites = await Favorite.getFavoritesByUser(userId);
+    return res.json(favorites);
   } catch (error) {
     next(error);
   }

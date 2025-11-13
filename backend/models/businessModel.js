@@ -1,167 +1,265 @@
+// models/businessModel.js
 const db = require('../db');
 
 class Business {
-  // Get all businesses (joins with Category for category name)
+  /**
+   * Get ALL businesses via stored procedure
+   * Matches: sp_get_all_businesses() RETURNS TABLE(...)
+   */
   static async getAll() {
-  // Result from CALL is nested in an array
-  const [rows] = await db.query('CALL sp_GetAllBusinesses()');
-  return rows[0];
-}
+    const result = await db.query(`SELECT * FROM sp_get_all_businesses()`);
+    return result.rows;
+  }
 
-  // Get business by ID
+  /**
+   * Get single business by ID
+   * Matches: sp_get_business_by_id(biz_id int)
+   */
   static async getById(id) {
-  const [rows] = await db.query('CALL sp_GetBusinessById(?)', [id]);
-  return rows[0][0]; // Result from CALL is nested
-}
+    const result = await db.query(
+      `SELECT * FROM sp_get_business_by_id($1)`,
+      [id]
+    );
 
-  // Get businesses by category ID
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Get all approved businesses in a category
+   */
   static async getByCategoryId(categoryId) {
-    const sql = `
+    const result = await db.query(
+      `
       SELECT b.*, c.name AS category_name
-      FROM Business b
-      JOIN Category c ON b.category_id = c.category_id
-      WHERE b.category_id = ? AND b.status = 'approved'
+      FROM "Business" b
+      JOIN "Category" c ON b.category_id = c.category_id
+      WHERE b.category_id = $1 AND b.status = 'approved'
       ORDER BY b.avg_rating DESC
-    `;
-    const [rows] = await db.query(sql, [categoryId]);
-    return rows;
+      `,
+      [categoryId]
+    );
+    return result.rows;
   }
 
-  // Search businesses by name
+  /**
+   * Search businesses by name (case-insensitive)
+   */
   static async searchByName(name) {
-    const sql = `
+    const result = await db.query(
+      `
       SELECT b.*, c.name AS category_name
-      FROM Business b
-      JOIN Category c ON b.category_id = c.category_id
-      WHERE b.name LIKE ? AND b.status = 'approved'
+      FROM "Business" b
+      JOIN "Category" c ON b.category_id = c.category_id
+      WHERE b.name ILIKE $1 AND b.status = 'approved'
       ORDER BY b.avg_rating DESC
-    `;
-    const [rows] = await db.query(sql, [`%${name}%`]);
-    return rows;
+      `,
+      [`%${name}%`]
+    );
+    return result.rows;
   }
 
-  // Filter by rating range
+  /**
+   * Filter by rating range
+   */
   static async filterByRating(minRating, maxRating) {
-    const sql = `
+    const result = await db.query(
+      `
       SELECT b.*, c.name AS category_name
-      FROM Business b
-      JOIN Category c ON b.category_id = c.category_id
-      WHERE b.avg_rating >= ? AND b.avg_rating <= ? AND b.status = 'approved'
+      FROM "Business" b
+      JOIN "Category" c ON b.category_id = c.category_id
+      WHERE b.avg_rating >= $1 
+      AND b.avg_rating <= $2 
+      AND b.status = 'approved'
       ORDER BY b.avg_rating DESC
-    `;
-    // Using <= for maxRating to include 5-star ratings in a 4-5 filter
-    const [rows] = await db.query(sql, [minRating, maxRating]);
-    return rows;
+      `,
+      [minRating, maxRating]
+    );
+    return result.rows;
   }
 
-  // Get top rated businesses
+  /**
+   * Get top rated businesses via stored function
+   * Matches: sp_get_top_rated_businesses(limit int)
+   */
   static async getTopRated(limit = 4) {
-  const [rows] = await db.query('CALL sp_GetTopRatedBusinesses(?)', [limit]);
-  return rows[0];
-}
-
-  // Create new business
-  static async create(businessData) {
-    // Note: owner_id and category_id must be provided
-    const { owner_id, category_id, name, description, address, city, state, pincode, phone, email,website=null, image } = businessData;
-    
-    const sql = `
-      INSERT INTO Business 
-      (owner_id, category_id, name, description, address, city, state, pincode, phone, email, website, image) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    
-    const [result] = await db.query(sql, [
-      owner_id, category_id, name, description, address, city, state, pincode, phone, email, website, image
-    ]);
-    
-    return this.getById(result.insertId);
+    const result = await db.query(
+      `SELECT * FROM sp_get_top_rated_businesses($1)`,
+      [limit]
+    );
+    return result.rows;
   }
 
-// Update business
-  static async update(id, businessData) {
-    // 1. Get the current business data from the DB
-    const currentBusiness = await this.getById(id);
-    if (!currentBusiness) {
-        throw new Error('Business not found');
-    }
+  /**
+   * Create business
+   * Uses RETURNING * so structure ALWAYS matches.
+   */
+  static async create(data) {
+    const {
+      owner_id,
+      category_id,
+      name,
+      description,
+      address,
+      city,
+      state,
+      pincode,
+      phone,
+      email,
+      website = null,
+      image
+    } = data;
 
-    // 2. Merge the existing data with the new (partial) data
-    // This preserves all old fields and updates new ones.
-    const dataToUpdate = {
-        ...currentBusiness, // Start with all old data
-        ...businessData     // Overwrite with any new data
-    };
+    const result = await db.query(
+      `
+      INSERT INTO "Business"
+      (owner_id, category_id, name, description, address, city, state, pincode, phone, email, website, image)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING *
+      `,
+      [
+        owner_id,
+        category_id,
+        name,
+        description,
+        address,
+        city,
+        state,
+        pincode,
+        phone,
+        email,
+        website,
+        image
+      ]
+    );
 
-    // 3. Destructure the *final* merged data
-    // Now, category_id, name, etc., are all present
-    const { 
-        category_id, name, description, address, city, state, 
-        pincode, phone, email, website, status, image 
-    } = dataToUpdate;
-    
-    // 4. Run the update query with the complete data
-    const sql = `
-      UPDATE Business SET 
-      category_id = ?, name = ?, description = ?, address = ?, city = ?, state = ?, pincode = ?, 
-      phone = ?, email = ?, website = ?, status = ?, image = ? 
-      WHERE business_id = ?
-    `;
-
-    await db.query(sql, [
-      category_id, name, description, address, city, state, pincode, 
-      phone, email, website, status, image, id
-    ]);
-    
-    // Return the new, fully updated business
-    return this.getById(id);
+    return result.rows[0];
   }
-  // Delete business
+
+  /**
+   * Update an existing business
+   * Merges existing data + new data → avoids undefined fields.
+   */
+  static async update(id, newData) {
+    const existing = await this.getById(id);
+    if (!existing) throw new Error("Business not found");
+
+    const data = { ...existing, ...newData };
+
+    const {
+      category_id,
+      name,
+      description,
+      address,
+      city,
+      state,
+      pincode,
+      phone,
+      email,
+      website,
+      status,
+      image
+    } = data;
+
+    const result = await db.query(
+      `
+      UPDATE "Business" 
+      SET 
+        category_id = $1,
+        name = $2,
+        description = $3,
+        address = $4,
+        city = $5,
+        state = $6,
+        pincode = $7,
+        phone = $8,
+        email = $9,
+        website = $10,
+        status = $11,
+        image = $12
+      WHERE business_id = $13
+      RETURNING *
+      `,
+      [
+        category_id,
+        name,
+        description,
+        address,
+        city,
+        state,
+        pincode,
+        phone,
+        email,
+        website,
+        status,
+        image,
+        id
+      ]
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Delete business
+   */
   static async delete(id) {
-    await db.query('DELETE FROM Business WHERE business_id = ?', [id]);
-    return { message: 'Business deleted successfully' };
-  }
-  // Add this new function to models/businessModel.js
-  // Admin function to approve all pending businesses
-  static async approveAllPending() {
-    const [rows] = await db.query('CALL sp_ApproveAllPendingBusinesses(@count)');
-    // The result will be in the final packet
-    return rows[rows.length - 1][0]; 
+    await db.query(`DELETE FROM "Business" WHERE business_id = $1`, [id]);
+    return { message: "Business deleted successfully" };
   }
 
-  // Find all businesses by owner ID
-static async findByOwner(ownerId) {
-    // This query now gets category_name, favorite_count, AND review_count
-    const sql = `
+  /**
+   * Approve all pending businesses
+   * Matches: sp_approve_all_pending_businesses() RETURNS TABLE(...)
+   */
+  static async approveAllPending() {
+    const result = await db.query(
+      `SELECT * FROM sp_approve_all_pending_businesses()`
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Find by owner
+   */
+  static async findByOwner(ownerId) {
+    const result = await db.query(
+      `
       SELECT 
         b.*, 
         c.name AS category_name,
-        (SELECT COUNT(*) FROM Favorite f WHERE f.business_id = b.business_id) AS favorite_count,
-        (SELECT COUNT(*) FROM Review r WHERE r.business_id = b.business_id) AS review_count
-      FROM Business b
-      JOIN Category c ON b.category_id = c.category_id
-      WHERE b.owner_id = ?
+        (SELECT COUNT(*) FROM "Favorite" f WHERE f.business_id = b.business_id) AS favorite_count,
+        (SELECT COUNT(*) FROM "Review" r WHERE r.business_id = b.business_id) AS review_count
+      FROM "Business" b
+      JOIN "Category" c ON b.category_id = c.category_id
+      WHERE b.owner_id = $1
       ORDER BY b.date_added DESC
-    `;
-    const [rows] = await db.query(sql, [ownerId]);
-    return rows;
+      `,
+      [ownerId]
+    );
+
+    return result.rows;
   }
-// Find all businesses with 'pending' status
-static async findPending() {
-  // We join with category to get the name, just like on the owner dashboard
-  const sql = `
-    SELECT 
-      b.*, 
-      c.name AS category_name,
-      (SELECT COUNT(*) FROM Review r WHERE r.business_id = b.business_id) AS review_count
-    FROM Business b
-    JOIN Category c ON b.category_id = c.category_id
-    WHERE b.status = 'pending'
-    ORDER BY b.date_added ASC
-  `;
-  const [rows] = await db.query(sql);
-  return rows;
-}
+
+  /**
+   * List all pending businesses
+   */
+  static async findPending() {
+    const result = await db.query(
+      `
+      SELECT 
+        b.*, 
+        c.name AS category_name,
+        (SELECT COUNT(*) FROM "Review" r WHERE r.business_id = b.business_id) AS review_count
+      FROM "Business" b
+      JOIN "Category" c ON b.category_id = c.category_id
+      WHERE b.status = 'pending'
+      ORDER BY b.date_added ASC
+      `
+    );
+
+    return result.rows;
+  }
 }
 
 module.exports = Business;

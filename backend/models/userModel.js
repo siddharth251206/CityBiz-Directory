@@ -1,59 +1,131 @@
+// models/userModel.js
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
 class User {
-  // Create new user
-  static async create(userData) {
+
+  // ======================================================
+  //  CREATE USER (REGISTER)
+  //  Uses PostgreSQL stored function: sp_register_user()
+  // ======================================================
+  static async register(userData) {
     const { name, email, password, role, phone } = userData;
-    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [rows] = await db.query(
-      'CALL sp_RegisterUser(?, ?, ?, ?, ?)',
-      [name, email, hashedPassword, role || 'viewer', phone]
-    );
+    const sql = `
+      SELECT * FROM sp_register_user($1, $2, $3, $4, $5)
+    `;
 
-    // Check if the procedure returned an error
-    if (rows[0][0].ErrorMessage) {
-      throw new Error(rows[0][0].ErrorMessage);
+    const result = await db.query(sql, [
+      name,
+      email,
+      password,           // hashed already in controller
+      role || "viewer",
+      phone
+    ]);
+
+    const row = result.rows[0];
+    if (!row.user_id) {
+      return { user_id: null, message: row.message };
     }
 
-    const userId = rows[0][0].user_id;
-    return { user_id: userId, name, email, role: role || 'viewer' };
+    return {
+      user_id: row.user_id,
+      name,
+      email,
+      role: role || "viewer",
+      phone,
+      message: row.message
+    };
   }
 
-  // Find user by email
+
+  // ======================================================
+  //  FIND USER BY EMAIL
+  // ======================================================
   static async findByEmail(email) {
-    const [rows] = await db.query('SELECT * FROM User WHERE email = ?', [email]);
-    return rows[0];
+    const result = await db.query(
+      `SELECT * FROM "User" WHERE email = $1`,
+      [email]
+    );
+    return result.rows[0] || null;
   }
 
-  // Find user by ID
+
+  // ======================================================
+  //  FIND USER BY ID
+  // ======================================================
   static async findById(id) {
-    const [rows] = await db.query('SELECT user_id, name, email, role, phone, date_joined FROM User WHERE user_id = ?', [id]);
-    return rows[0];
+    const result = await db.query(
+      `SELECT user_id, name, email, role, phone, date_joined FROM "User" WHERE user_id = $1`,
+      [id]
+    );
+    return result.rows[0] || null;
   }
 
-  // Verify password
-  static async verifyPassword(plainPassword, hashedPassword) {
-    return await bcrypt.compare(plainPassword, hashedPassword);
+
+  // ======================================================
+  //  UPDATE USER
+  // ======================================================
+  static async update(id, data) {
+    const { name, email, phone, password } = data;
+
+    const fields = [];
+    const values = [];
+    let idx = 1;
+
+    if (name) {
+      fields.push(`name = $${idx++}`);
+      values.push(name);
+    }
+    if (email) {
+      fields.push(`email = $${idx++}`);
+      values.push(email);
+    }
+    if (phone) {
+      fields.push(`phone = $${idx++}`);
+      values.push(phone);
+    }
+    if (password) {
+      fields.push(`password = $${idx++}`);
+      values.push(password);
+    }
+
+    values.push(id);
+
+    const sql = `
+      UPDATE "User"
+      SET ${fields.join(", ")}
+      WHERE user_id = $${idx}
+      RETURNING user_id, name, email, role, phone, date_joined
+    `;
+
+    const result = await db.query(sql, values);
+    return result.rows[0] || null;
   }
 
-  // Update user
-  static async update(id, userData) {
-    const { name, email, phone } = userData;
-    await db.query('UPDATE User SET name = ?, email = ?, phone = ? WHERE user_id = ?', [name, email, phone, id]);
-    return this.findById(id);
-  }
 
-  // Delete user
+  // ======================================================
+  //  DELETE USER
+  // ======================================================
   static async delete(id) {
-    await db.query('DELETE FROM User WHERE user_id = ?', [id]);
-    return { message: 'User deleted successfully' };
+    await db.query(
+      `DELETE FROM "User" WHERE user_id = $1`,
+      [id]
+    );
+    return { message: "User deleted successfully" };
   }
+
+
+  // ======================================================
+  //  REVIEW COUNT (uses stored function)
+  // ======================================================
   static async getReviewCount(userId) {
-  const [rows] = await db.query('SELECT fn_GetUserReviewCount(?) AS count', [userId]);
-  return rows[0].count;
-}
+    const result = await db.query(
+      `SELECT fn_get_user_review_count($1) AS count`,
+      [userId]
+    );
+    return result.rows[0].count;
+  }
 }
 
 module.exports = User;
